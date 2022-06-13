@@ -6,6 +6,7 @@ package ejerspaco;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.Scanner;
 
 /**
  *
@@ -20,9 +21,12 @@ public class bases2 {
         
         
         Consultas base = new Consultas("jdbc:mysql://localhost:3306/test","root","");
+        Statement a = base.conexion().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        Scanner sc = new Scanner (System.in);
+        ResultSet rs = a.executeQuery("Select * from ejer7."+sc.next()+";");
         base.conexion();
-        base.modificacionDeDatos(4, 4, "Victi", 6000);
-        base.insercionDeDatos(22, "Victi2", 23);
+        base.vertabla(a,rs);
+        base.cerrar();
             
             
     }

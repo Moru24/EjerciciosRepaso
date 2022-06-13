@@ -7,13 +7,16 @@ package ejerspaco;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Moru
  */
 public class Consultas {
-    Scanner sc = new Scanner (System.in);
+
+    Scanner sc = new Scanner(System.in);
 
     String url;
     String user;
@@ -90,40 +93,61 @@ public class Consultas {
 
     public void insercionDeDatos(int id, String Nombre, int año) throws ClassNotFoundException, SQLException, IOException {
         Archivo a = new Archivo();
-        
 
         Statement stmnt = conexion().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
         PreparedStatement stm = conexion().prepareCall("insert into ejer7.general (id,nombre,edad) values (?,?,?);");
         ResultSet rs = stmnt.executeQuery("Select * from ejer7.general");
-        
+
         //esto no esta bien deberia irse a otro metodo pero es para probar en el mismo
         System.out.println("Quieres añadir: 1. muchos datos 2.solo 1");
-        if (sc.nextInt()==1) {
+        if (sc.nextInt() == 1) {
             for (int i = 0; i < 10; i++) {
-                int ida=(30+i);
-                int añoa=(23+i);
+                int ida = (30 + i);
+                int añoa = (23 + i);
                 stm.setInt(1, ida);
                 stm.setString(2, Nombre);
                 stm.setInt(3, añoa);
                 stm.executeUpdate();
                 a.escribir(rs.getRow(), ida, Nombre, añoa);
             }
-        }else{
-        rs.moveToInsertRow();
-        rs.updateInt(1, id);
-        rs.updateString(2, Nombre);
-        rs.updateInt(3, año);
-        rs.insertRow();
-        a.escribir(rs.getRow(), id, Nombre, año);
+        } else {
+            rs.moveToInsertRow();
+            rs.updateInt(1, id);
+            rs.updateString(2, Nombre);
+            rs.updateInt(3, año);
+            rs.insertRow();
+            a.escribir(rs.getRow(), id, Nombre, año);
 
         }
         a.cerrar();
-        
 
-       
     }
-    public void cerrar() throws ClassNotFoundException, SQLException{
+
+    public void cerrar() throws ClassNotFoundException, SQLException {
         this.conexion().close();
+    }
+
+    public void vertabla( Statement a,   ResultSet rs ) {
+        try {
+            
+            rs.last();
+            int tamaño = rs.getRow();
+            rs.first();
+            
+            ResultSetMetaData rsa= rs.getMetaData();
+            int longitud = rsa.getColumnCount();
+            
+            while(rs.next()){
+                for (int i = 1; i <= longitud; i++) {
+                    System.out.print(rsa.getColumnTypeName(i)+" "+rs.getString(i)+"\t");
+                }
+                System.out.println(" ");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Consultas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }
